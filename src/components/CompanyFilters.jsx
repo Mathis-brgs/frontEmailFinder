@@ -1,7 +1,7 @@
-// CompanyFilters.jsx
-import { Search, Filter, X, ChevronDown } from "lucide-react";
-import { useState, useEffect, useCallback } from "react";
-import NAFSearchField from "./NAFSearchField"; // Import du composant
+import { Search, Filter, ChevronDown, X } from "lucide-react";
+
+import { useState, useCallback } from "react";
+import NAFSearchField from "./NAFSearchField";
 
 const CompanyFilters = ({
   filters,
@@ -10,6 +10,7 @@ const CompanyFilters = ({
   isSearching,
 }) => {
   const [openDropdowns, setOpenDropdowns] = useState({});
+  const [cityInputRef] = useState(null);
 
   const handleFilterChange = useCallback(
     (field, value) => {
@@ -40,18 +41,10 @@ const CompanyFilters = ({
   const removeFilter = useCallback(
     (field, value) => {
       const currentValues = filters[field] || [];
-      let newValues;
-
-      if (field === "naf_sous_classes") {
-        // Pour NAF, comparer par code
-        newValues = currentValues.filter((item) => item.code !== value.code);
-      } else {
-        newValues = currentValues.filter((item) => item !== value);
-      }
-
+      const newValues = currentValues.filter((item) => item !== value);
       handleFilterChange(field, newValues);
     },
-    [handleFilterChange]
+    [filters, handleFilterChange]
   );
 
   const toggleDropdown = useCallback((field) => {
@@ -101,12 +94,6 @@ const CompanyFilters = ({
     [addCity]
   );
 
-  const handleClickOutside = useCallback((e) => {
-    if (!e.target.closest(".relative")) {
-      setOpenDropdowns({});
-    }
-  }, []);
-
   const clearAllFilters = useCallback(() => {
     onFiltersChange({
       naf_sous_classes: [],
@@ -115,17 +102,23 @@ const CompanyFilters = ({
     });
   }, [onFiltersChange]);
 
+  const handleSearch = useCallback(() => {
+    console.log("🚀 Déclenchement recherche avec filtres:", filters);
+    if (!filters.naf_sous_classes || filters.naf_sous_classes.length === 0) {
+      alert(
+        "Veuillez sélectionner au moins un code NAF pour effectuer la recherche."
+      );
+      return;
+    }
+    onSearch(filters);
+  }, [filters, onSearch]);
+
   const sizeOptions = [
     { value: "TPE", label: "TPE (1-9 employés)" },
     { value: "PME", label: "PME (10-249 employés)" },
     { value: "ETI", label: "ETI (250-4999 employés)" },
     { value: "GE", label: "GE (5000+ employés)" },
   ];
-
-  useEffect(() => {
-    document.addEventListener("click", handleClickOutside);
-    return () => document.removeEventListener("click", handleClickOutside);
-  }, [handleClickOutside]);
 
   return (
     <div className="bg-white rounded-lg shadow-md p-6">
@@ -135,7 +128,7 @@ const CompanyFilters = ({
       </h2>
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
-        {/* Filtre NAF - Composant séparé */}
+        {/* NAF Search Field Component */}
         <NAFSearchField filters={filters} onFilterChange={handleFilterChange} />
 
         {/* Filtre Tailles */}
@@ -221,6 +214,7 @@ const CompanyFilters = ({
             Villes
           </label>
           <input
+            ref={cityInputRef}
             type="text"
             className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             placeholder="Tapez une ville et appuyez sur Entrée"
@@ -248,11 +242,23 @@ const CompanyFilters = ({
           )}
         </div>
 
-        <div className="flex items-end">
+        {/* BOUTON RECHERCHE */}
+        <div className="">
+          <label
+            className="block text-sm font-medium  mb-2 invisible
+"
+          >
+            Rechercher
+          </label>
           <button
-            onClick={onSearch}
-            disabled={isSearching}
-            className="w-full bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors disabled:bg-blue-400 flex items-center justify-center gap-2"
+            onClick={handleSearch}
+            disabled={
+              isSearching ||
+              !filters.naf_sous_classes ||
+              filters.naf_sous_classes.length === 0
+            }
+            className="w-full bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors disabled:bg-blue-400 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+            type="button"
           >
             <Search className="w-4 h-4" />
             {isSearching ? "Recherche..." : "Rechercher"}
@@ -270,7 +276,7 @@ const CompanyFilters = ({
               Filtres actifs:{" "}
               {(filters.naf_sous_classes?.length || 0) +
                 (filters.sizes?.length || 0) +
-                (filters.cities?.length || 0)}{" "}
+                (filters.cities?.length || 0)}
               sélection(s)
             </span>
             <button

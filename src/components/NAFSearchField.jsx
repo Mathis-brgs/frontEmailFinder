@@ -1,4 +1,3 @@
-// NAFSearchField.jsx
 import { useState, useCallback, useRef } from "react";
 import { X } from "lucide-react";
 
@@ -11,7 +10,6 @@ const NAFSearchField = ({ filters, onFilterChange }) => {
 
   const inputRef = useRef(null);
 
-  // Fonction de recherche NAF
   const searchNaf = useCallback(async (searchTerm) => {
     if (!searchTerm || searchTerm.trim().length < 2) {
       setResults([]);
@@ -48,7 +46,6 @@ const NAFSearchField = ({ filters, onFilterChange }) => {
       const value = e.target.value;
       setSearchTerm(value);
 
-      // Réinitialiser si l'utilisateur efface
       if (hasSearched && value.length === 0) {
         setResults([]);
         setShowResults(false);
@@ -65,10 +62,6 @@ const NAFSearchField = ({ filters, onFilterChange }) => {
       if (e.key === "Enter" && trimmedValue.length >= 2) {
         e.preventDefault();
         searchNaf(trimmedValue);
-
-        if (e.key === " " && !trimmedValue.endsWith(" ")) {
-          setSearchTerm(trimmedValue + " ");
-        }
       }
     },
     [searchTerm, searchNaf]
@@ -93,13 +86,11 @@ const NAFSearchField = ({ filters, onFilterChange }) => {
         onFilterChange("naf_sous_classes", newNaf);
       }
 
-      // Réinitialiser la recherche
       setSearchTerm("");
       setShowResults(false);
       setResults([]);
       setHasSearched(false);
 
-      // Remettre le focus
       setTimeout(() => {
         if (inputRef.current) {
           inputRef.current.focus();
@@ -121,7 +112,7 @@ const NAFSearchField = ({ filters, onFilterChange }) => {
   return (
     <div className="relative">
       <label className="block text-sm font-medium text-gray-700 mb-2">
-        Activités (NAF)
+        Secteurs (NAF)
       </label>
       <div className="relative">
         <input
@@ -143,7 +134,11 @@ const NAFSearchField = ({ filters, onFilterChange }) => {
       </div>
 
       {/* Indication pour l'utilisateur */}
-      {searchTerm.trim().length >= 2 && !hasSearched && !isSearching}
+      {searchTerm.trim().length >= 2 && !hasSearched && !isSearching && (
+        <div className="mt-1 text-xs text-gray-500">
+          Appuyez sur Entrée pour lancer la recherche
+        </div>
+      )}
 
       {/* Résultats de recherche */}
       {showResults && results.length > 0 && (
