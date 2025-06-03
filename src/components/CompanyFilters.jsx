@@ -1,5 +1,4 @@
 import { Search, Filter, ChevronDown, X } from "lucide-react";
-
 import { useState, useCallback } from "react";
 import NAFSearchField from "./NAFSearchField";
 
@@ -11,6 +10,9 @@ const CompanyFilters = ({
 }) => {
   const [openDropdowns, setOpenDropdowns] = useState({});
   const [cityInputRef] = useState(null);
+
+  // filtres désactivés avant implementation de la recherche par taille et ville
+  const [filtersDisabled] = useState(true);
 
   const handleFilterChange = useCallback(
     (field, value) => {
@@ -138,8 +140,12 @@ const CompanyFilters = ({
           <div className="relative">
             <button
               type="button"
-              onClick={() => toggleDropdown("sizes")}
-              className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white text-left flex items-center justify-between"
+              onClick={() => !filtersDisabled && toggleDropdown("sizes")} // TODO: réactiver ici
+              className={`w-full p-3 border border-gray-300 rounded-lg bg-white text-left flex items-center justify-between ${
+                filtersDisabled
+                  ? "pointer-events-none opacity-50"
+                  : "focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              }`}
             >
               <span
                 className={
@@ -150,8 +156,7 @@ const CompanyFilters = ({
               >
                 {(filters.sizes?.length || 0) === 0
                   ? "Toutes les tailles"
-                  : `${filters.sizes?.length || 0}`}{" "}
-                sélection(s)
+                  : `${filters.sizes?.length || 0} sélection(s)`}
               </span>
 
               <ChevronDown
@@ -161,26 +166,27 @@ const CompanyFilters = ({
               />
             </button>
 
-            {openDropdowns.sizes && (
-              <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-auto">
-                {sizeOptions.map((option) => (
-                  <label
-                    key={option.value}
-                    className="flex items-center px-3 py-2 hover:bg-gray-50 cursor-pointer"
-                  >
-                    <input
-                      type="checkbox"
-                      checked={(filters.sizes || []).includes(option.value)}
-                      onChange={() =>
-                        handleMultiSelectChange("sizes", option.value)
-                      }
-                      className="mr-3 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                    />
-                    <span className="text-sm">{option.label}</span>
-                  </label>
-                ))}
-              </div>
-            )}
+            {openDropdowns.sizes &&
+              !filtersDisabled && ( // filtres désactivés avant implementation de la recherche par taille et ville
+                <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-auto">
+                  {sizeOptions.map((option) => (
+                    <label
+                      key={option.value}
+                      className="flex items-center px-3 py-2 hover:bg-gray-50 cursor-pointer"
+                    >
+                      <input
+                        type="checkbox"
+                        checked={(filters.sizes || []).includes(option.value)}
+                        onChange={() =>
+                          handleMultiSelectChange("sizes", option.value)
+                        }
+                        className="mr-3 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                      />
+                      <span className="text-sm">{option.label}</span>
+                    </label>
+                  ))}
+                </div>
+              )}
 
             {(filters.sizes?.length || 0) > 0 && (
               <div className="flex flex-wrap gap-1 mt-2">
@@ -217,10 +223,14 @@ const CompanyFilters = ({
           <input
             ref={cityInputRef}
             type="text"
-            className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className={`w-full p-3 border border-gray-300 rounded-lg ${
+              filtersDisabled
+                ? "pointer-events-none opacity-50"
+                : "focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            }`}
             placeholder="Tapez une ville et appuyez sur Entrée"
-            onKeyDown={handleCityKeyPress}
-            onBlur={handleCityBlur}
+            onKeyDown={filtersDisabled ? undefined : handleCityKeyPress} // filtres désactivés avant implementation de la recherche par taille et ville
+            onBlur={filtersDisabled ? undefined : handleCityBlur} // filtres désactivés avant implementation de la recherche par taille et ville
             autoComplete="off"
           />
           {filters.cities && filters.cities.length > 0 && (
@@ -243,12 +253,9 @@ const CompanyFilters = ({
           )}
         </div>
 
-        {/* BOUTON RECHERCHE */}
-        <div className="">
-          <label
-            className="block text-sm font-medium  mb-2 invisible
-"
-          >
+        {/* Bouton Rechercher */}
+        <div>
+          <label className="block text-sm font-medium mb-2 invisible">
             Rechercher
           </label>
           <button
