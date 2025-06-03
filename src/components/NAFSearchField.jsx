@@ -9,8 +9,8 @@ const NAFSearchField = ({ filters, onFilterChange }) => {
   const [hasSearched, setHasSearched] = useState(false);
   const API_URL =
     window.location.hostname === "localhost"
-      ? "http://localhost:8000"
-      : "http://10.1.1.57:8000";
+      ? process.env.REACT_APP_API_URL_LOCAL
+      : process.env.REACT_APP_API_URL;
   const inputRef = useRef(null);
 
   const searchNaf = useCallback(async (searchTerm) => {
