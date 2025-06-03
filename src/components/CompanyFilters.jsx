@@ -103,7 +103,6 @@ const CompanyFilters = ({
   }, [onFiltersChange]);
 
   const handleSearch = useCallback(() => {
-    console.log("🚀 Déclenchement recherche avec filtres:", filters);
     if (!filters.naf_sous_classes || filters.naf_sous_classes.length === 0) {
       alert(
         "Veuillez sélectionner au moins un code NAF pour effectuer la recherche."
@@ -151,8 +150,10 @@ const CompanyFilters = ({
               >
                 {(filters.sizes?.length || 0) === 0
                   ? "Toutes les tailles"
-                  : `${filters.sizes?.length || 0} sélection(s)`}
+                  : `${filters.sizes?.length || 0}`}{" "}
+                sélection(s)
               </span>
+
               <ChevronDown
                 className={`w-4 h-4 transition-transform ${
                   openDropdowns.sizes ? "rotate-180" : ""
@@ -276,7 +277,7 @@ const CompanyFilters = ({
               Filtres actifs:{" "}
               {(filters.naf_sous_classes?.length || 0) +
                 (filters.sizes?.length || 0) +
-                (filters.cities?.length || 0)}
+                (filters.cities?.length || 0)}{" "}
               sélection(s)
             </span>
             <button

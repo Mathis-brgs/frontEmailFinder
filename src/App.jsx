@@ -6,10 +6,14 @@ import CompanyTable from "./components/CompanyTable";
 import ContactFilters from "./components/ContactFilters";
 import ContactTable from "./components/ContactTable";
 
+const API_URL =
+  window.location.hostname === "localhost"
+    ? "http://localhost:8000"
+    : "http://10.1.1.57:8000";
+
 const App = () => {
-  // États pour les filtres
   const [companyFilters, setCompanyFilters] = useState({
-    naf_sous_classes: [], // ✅ Changé de industries vers naf_sous_classes
+    naf_sous_classes: [],
     sizes: [],
     cities: [],
   });
@@ -18,22 +22,17 @@ const App = () => {
     position: "",
   });
 
-  // États pour la sélection et le chargement
   const [selectedDomain, setSelectedDomain] = useState("");
   const [isFindingEmails, setIsFindingEmails] = useState(false);
 
-  // États pour les données entreprises
   const [companies, setCompanies] = useState([]);
   const [isSearching, setIsSearching] = useState(false);
   const [companyError, setCompanyError] = useState("");
   const [searchPerformed, setSearchPerformed] = useState(false);
 
-  // États pour les contacts
   const [contacts, setContacts] = useState([]);
   const [isLoadingContacts, setIsLoadingContacts] = useState(false);
   const [contactError, setContactError] = useState("");
-
-  // ============== GESTION ENTREPRISES ==============
 
   const handleCompanySearch = async (filters) => {
     if (!filters?.naf_sous_classes?.length) {
@@ -45,23 +44,18 @@ const App = () => {
     setCompanies([]);
 
     try {
-      const response = await fetch(
-        `http://localhost:8000/api/companies/search`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            naf_sous_classes: filters.naf_sous_classes.map(
-              (naf) => naf.libelle
-            ),
+      const response = await fetch(`${API_URL}/api/companies/search`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          naf_sous_classes: filters.naf_sous_classes.map((naf) => naf.libelle),
 
-            sizes: filters.sizes || [],
-            cities: filters.cities || [],
-          }),
-        }
-      );
+          sizes: filters.sizes || [],
+          cities: filters.cities || [],
+        }),
+      });
 
       if (response.ok) {
         const data = await response.json();
@@ -86,14 +80,11 @@ const App = () => {
     );
   };
 
-  // ============== GESTION CONTACTS ==============
-
   const handleSnovioQuery = async (domain) => {
     setIsFindingEmails(true);
 
     try {
-      // Appel à l'API Snovio pour compter les emails
-      const response = await fetch("http://localhost:8000/api/snovio/count", {
+      const response = await fetch(`${API_URL}/api/snovio/count`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -140,22 +131,18 @@ const App = () => {
         ...(jobFilters.position && { job_titles: jobFilters.position }),
       });
 
-      const response = await fetch(
-        `http://localhost:8000/api/prospects?${queryParams}`,
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
+      const response = await fetch(`${API_URL}/api/prospects?${queryParams}`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
 
       if (!response.ok) {
         throw new Error(`Erreur ${response.status}`);
       }
 
       const data = await response.json();
-      console.log("Résultats contacts:", data);
 
       if (data.results && data.results.length > 0) {
         setContacts(data.results);
@@ -178,12 +165,11 @@ const App = () => {
 
   const handleDomainSelect = (domain) => {
     setSelectedDomain(domain);
-    setContacts([]); // Reset des contacts lors du changement de domaine
+    setContacts([]);
     setContactError("");
   };
 
   const resetAll = () => {
-    // Reset des filtres
     setCompanyFilters({
       naf_sous_classes: [],
       sizes: [],
@@ -202,8 +188,6 @@ const App = () => {
     setCompanyError("");
     setContactError("");
     setSearchPerformed(false);
-
-    console.log("🔄 Application remise à zéro");
   };
 
   return (
@@ -227,7 +211,7 @@ const App = () => {
             )}
             {companyFilters.naf_sous_classes.length > 0 && (
               <span className="text-blue-600">
-                {companyFilters.naf_sous_classes.length} code(s) NAF
+                {companyFilters.naf_sous_classes.length} secteur(s) NAF
                 sélectionné(s)
               </span>
             )}

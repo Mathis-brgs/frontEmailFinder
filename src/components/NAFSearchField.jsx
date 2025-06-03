@@ -7,7 +7,10 @@ const NAFSearchField = ({ filters, onFilterChange }) => {
   const [isSearching, setIsSearching] = useState(false);
   const [showResults, setShowResults] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
-
+  const API_URL =
+    window.location.hostname === "localhost"
+      ? "http://localhost:8000"
+      : "http://10.1.1.57:8000";
   const inputRef = useRef(null);
 
   const searchNaf = useCallback(async (searchTerm) => {
@@ -20,7 +23,7 @@ const NAFSearchField = ({ filters, onFilterChange }) => {
     setIsSearching(true);
     try {
       const response = await fetch(
-        `http://localhost:8000/api/naf/search-naf?q=${encodeURIComponent(
+        `${API_URL}/api/naf/search-naf?q=${encodeURIComponent(
           searchTerm.trim()
         )}&limit=10`
       );
