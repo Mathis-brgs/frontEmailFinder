@@ -1,5 +1,6 @@
 import { useState, useCallback, useRef } from "react";
 import { X } from "lucide-react";
+import { useEffect } from "react";
 
 const NAFSearchField = ({ filters, onFilterChange }) => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -7,6 +8,7 @@ const NAFSearchField = ({ filters, onFilterChange }) => {
   const [isSearching, setIsSearching] = useState(false);
   const [showResults, setShowResults] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
+  const debounceTimeout = useRef(null);
   const API_URL =
     window.location.hostname === "localhost"
       ? process.env.REACT_APP_API_URL_LOCAL
@@ -52,13 +54,21 @@ const NAFSearchField = ({ filters, onFilterChange }) => {
       const value = e.target.value;
       setSearchTerm(value);
 
-      if (hasSearched && value.length === 0) {
+      if (debounceTimeout.current) {
+        clearTimeout(debounceTimeout.current);
+      }
+
+      if (value.trim().length >= 2) {
+        debounceTimeout.current = setTimeout(() => {
+          searchNaf(value.trim());
+        }, 1000); // 1 seconde
+      } else {
         setResults([]);
         setShowResults(false);
         setHasSearched(false);
       }
     },
-    [hasSearched]
+    [searchNaf]
   );
 
   const handleKeyPress = useCallback(
@@ -115,6 +125,14 @@ const NAFSearchField = ({ filters, onFilterChange }) => {
     [filters.naf_sous_classes, onFilterChange]
   );
 
+  useEffect(() => {
+    return () => {
+      if (debounceTimeout.current) {
+        clearTimeout(debounceTimeout.current);
+      }
+    };
+  }, []);
+
   return (
     <div className="relative">
       <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -138,13 +156,6 @@ const NAFSearchField = ({ filters, onFilterChange }) => {
           </div>
         )}
       </div>
-
-      {/* Indication pour l'utilisateur */}
-      {searchTerm.trim().length >= 2 && !hasSearched && !isSearching && (
-        <div className="mt-1 text-xs text-gray-500">
-          Appuyez sur Entrée pour lancer la recherche
-        </div>
-      )}
 
       {/* Résultats de recherche */}
       {showResults && results.length > 0 && (

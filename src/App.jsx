@@ -33,6 +33,7 @@ const App = () => {
   const [contacts, setContacts] = useState([]);
   const [isLoadingContacts, setIsLoadingContacts] = useState(false);
   const [contactError, setContactError] = useState("");
+  const [hasSearched, setHasSearched] = useState(false);
 
   const handleCompanySearch = async (filters) => {
     if (!filters?.naf_sous_classes?.length) {
@@ -114,13 +115,6 @@ const App = () => {
   };
 
   const handleContactSearch = async () => {
-    if (!selectedDomain) {
-      setContactError(
-        "Aucun domaine sélectionné pour la recherche de contacts"
-      );
-      return;
-    }
-
     setIsLoadingContacts(true);
     setContactError("");
     setContacts([]);
@@ -160,6 +154,7 @@ const App = () => {
       );
     } finally {
       setIsLoadingContacts(false);
+      setHasSearched(true);
     }
   };
 
@@ -307,24 +302,7 @@ const App = () => {
               isLoading={isLoadingContacts}
             />
 
-            {/* Table des contacts */}
-            {contacts.length > 0 && <ContactTable contacts={contacts} />}
-
-            {/* Message si aucun contact trouvé */}
-            {!isLoadingContacts &&
-              contacts.length === 0 &&
-              jobFilters.position && (
-                <div className="bg-white rounded-lg shadow-md p-6 text-center">
-                  <p className="text-gray-500 mb-2">
-                    Aucun contact trouvé pour "{jobFilters.position}" chez{" "}
-                    {selectedDomain}
-                  </p>
-                  <p className="text-sm text-gray-400">
-                    Essayez d'autres intitulés de poste ou lancez une recherche
-                    sans filtre.
-                  </p>
-                </div>
-              )}
+            <ContactTable contacts={contacts} hasSearched={hasSearched} />
           </>
         )}
       </div>

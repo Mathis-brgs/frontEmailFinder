@@ -1,5 +1,12 @@
 import React, { useState } from "react";
-import { Mail, Building, AlertCircle, CheckCircle, Search } from "lucide-react";
+import {
+  Mail,
+  Building,
+  AlertCircle,
+  CheckCircle,
+  Search,
+  User,
+} from "lucide-react";
 
 const CompanyTable = ({
   companies,
@@ -116,7 +123,7 @@ const CompanyTable = ({
       <div className="flex items-center gap-1">
         <CheckCircle className="w-3 h-3 text-green-500" />
         <span className="px-2 py-1 text-xs rounded-full bg-green-100 text-green-800">
-          {snovioData.email_count} emails disponibles
+          {snovioData.email_count} emails
         </span>
       </div>
     );
@@ -145,19 +152,48 @@ const CompanyTable = ({
               <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">
                 Vérification emails
               </th>
+              <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">
+                Chercher prospects
+              </th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-200">
             {companies.map((company, index) => (
               <tr key={index} className="hover:bg-gray-50">
-                <td className="px-4 py-3 font-medium text-gray-900">
+                <td className="px-4 py-3 font-medium text-sm text-gray-900">
                   {company.siren || "N/A"}
                 </td>
-                <td className="px-4 py-3 font-medium text-gray-900">
+                <td className="px-4 py-3 font-medium text-sm text-gray-900">
                   {company.company_name}
                 </td>
-                <td className="px-4 py-3 text-gray-600">{company.naf_label}</td>
+                <td className="px-4 py-3 text-gray-600 text-sm">
+                  {company.naf_label}
+                </td>
                 <td className="px-4 py-3">{renderEmailStatus(company)}</td>
+                <td className="px-4 py-3">
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => {
+                        if (company.domain) {
+                          onSelectDomain(company.domain);
+                        }
+                      }}
+                      disabled={!company.domain}
+                      className={`px-3 py-1 text-xs rounded flex items-center gap-1
+    ${
+      !company.domain
+        ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+        : selectedDomain === company.domain
+        ? "bg-green-600 text-white"
+        : "bg-blue-600 text-white hover:bg-blue-700"
+    }
+  `}
+                    >
+                      <User className="w-3 h-3" />
+                      Détails
+                    </button>
+                  </div>
+                </td>
               </tr>
             ))}
           </tbody>
