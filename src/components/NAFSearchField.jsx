@@ -13,36 +13,39 @@ const NAFSearchField = ({ filters, onFilterChange }) => {
       : process.env.REACT_APP_API_URL;
   const inputRef = useRef(null);
 
-  const searchNaf = useCallback(async (searchTerm) => {
-    if (!searchTerm || searchTerm.trim().length < 2) {
-      setResults([]);
-      setShowResults(false);
-      return;
-    }
-
-    setIsSearching(true);
-    try {
-      const response = await fetch(
-        `${API_URL}/api/naf/search-naf?q=${encodeURIComponent(
-          searchTerm.trim()
-        )}&limit=10`
-      );
-      if (response.ok) {
-        const data = await response.json();
-        setResults(data);
-        setShowResults(true);
-        setHasSearched(true);
-      } else {
-        console.error("Erreur lors de la recherche NAF");
+  const searchNaf = useCallback(
+    async (searchTerm) => {
+      if (!searchTerm || searchTerm.trim().length < 2) {
         setResults([]);
+        setShowResults(false);
+        return;
       }
-    } catch (error) {
-      console.error("Erreur lors de la recherche NAF:", error);
-      setResults([]);
-    } finally {
-      setIsSearching(false);
-    }
-  }, []);
+
+      setIsSearching(true);
+      try {
+        const response = await fetch(
+          `${API_URL}/api/naf/search-naf?q=${encodeURIComponent(
+            searchTerm.trim()
+          )}&limit=10`
+        );
+        if (response.ok) {
+          const data = await response.json();
+          setResults(data);
+          setShowResults(true);
+          setHasSearched(true);
+        } else {
+          console.error("Erreur lors de la recherche NAF");
+          setResults([]);
+        }
+      } catch (error) {
+        console.error("Erreur lors de la recherche NAF:", error);
+        setResults([]);
+      } finally {
+        setIsSearching(false);
+      }
+    },
+    [API_URL]
+  );
 
   const handleInputChange = useCallback(
     (e) => {
