@@ -51,7 +51,7 @@ const ContactFilters = ({
           />
         </div>
 
-        {/* Bouton recherche - logique originale conservée */}
+        {/* Bouton recherche */}
         <div className="flex items-end">
           <button
             onClick={onSearch}

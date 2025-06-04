@@ -22,13 +22,11 @@ const PosteSearchField = ({ filters, onFilterChange }) => {
       const titleExists = currentTitles.includes(titre);
 
       if (titleExists) {
-        // Supprimer le titre s'il existe déjà
         onFilterChange((prev) => ({
           ...prev,
           titles: currentTitles.filter((title) => title !== titre),
         }));
       } else {
-        // Ajouter le titre s'il n'existe pas
         onFilterChange((prev) => ({
           ...prev,
           titles: [...currentTitles, titre],
@@ -70,7 +68,6 @@ const PosteSearchField = ({ filters, onFilterChange }) => {
     }
   }, []);
 
-  // Debounce pour la recherche
   useEffect(() => {
     if (debounceTimeout.current) {
       clearTimeout(debounceTimeout.current);
@@ -93,7 +90,6 @@ const PosteSearchField = ({ filters, onFilterChange }) => {
     };
   }, [searchTerm, searchPostes]);
 
-  // Fermer le dropdown au clic extérieur
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {

@@ -1,7 +1,6 @@
 import { Mail, ExternalLink, Briefcase } from "lucide-react";
 
 const ContactTable = ({ contacts, hasSearched }) => {
-  // Ne rien afficher si aucune recherche n'a été effectuée
   if (!hasSearched) {
     return null;
   }
