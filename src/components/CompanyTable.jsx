@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { Mail, Building, AlertCircle, Search, User } from "lucide-react";
 
 const CompanyTable = ({
