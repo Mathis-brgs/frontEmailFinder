@@ -1,5 +1,5 @@
 import { Search, Filter, ChevronDown, X } from "lucide-react";
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import NAFSearchField from "./NAFSearchField";
 
 const CompanyFilters = ({
@@ -10,8 +10,8 @@ const CompanyFilters = ({
 }) => {
   const [openDropdowns, setOpenDropdowns] = useState({});
   const [cityInputRef] = useState(null);
-
   const [filtersDisabled] = useState(false);
+  const sizeDropdownRef = useRef(null);
 
   const handleFilterChange = useCallback(
     (field, value) => {
@@ -26,13 +26,9 @@ const CompanyFilters = ({
   const handleMultiSelectChange = useCallback(
     (field, value) => {
       const currentValues = filters[field] || [];
-      let newValues;
-
-      if (currentValues.includes(value)) {
-        newValues = currentValues.filter((item) => item !== value);
-      } else {
-        newValues = [...currentValues, value];
-      }
+      const newValues = currentValues.includes(value)
+        ? currentValues.filter((item) => item !== value)
+        : [...currentValues, value];
 
       handleFilterChange(field, newValues);
     },
@@ -130,6 +126,26 @@ const CompanyFilters = ({
     { label: "10 000 salariés et plus" },
   ];
 
+  // 🧠 Fermer dropdown au clic extérieur
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (
+        sizeDropdownRef.current &&
+        !sizeDropdownRef.current.contains(event.target)
+      ) {
+        setOpenDropdowns((prev) => ({
+          ...prev,
+          sizes: false,
+        }));
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
   return (
     <div className="bg-white rounded-lg shadow-md p-6">
       <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
@@ -138,7 +154,7 @@ const CompanyFilters = ({
       </h2>
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
-        {/* NAF Search Field Component */}
+        {/* NAF Search Field */}
         <NAFSearchField filters={filters} onFilterChange={handleFilterChange} />
 
         {/* Filtre Tailles */}
@@ -149,7 +165,7 @@ const CompanyFilters = ({
           <div className="relative">
             <button
               type="button"
-              onClick={() => !filtersDisabled && toggleDropdown("sizes")} // TODO: réactiver ici
+              onClick={() => !filtersDisabled && toggleDropdown("sizes")}
               className={`w-full p-3 border border-gray-300 rounded-lg bg-white text-left flex items-center justify-between ${
                 filtersDisabled
                   ? "pointer-events-none opacity-50"
@@ -167,7 +183,6 @@ const CompanyFilters = ({
                   ? "Toutes les tailles"
                   : `${filters.sizes?.length || 0} sélection(s)`}
               </span>
-
               <ChevronDown
                 className={`w-4 h-4 transition-transform ${
                   openDropdowns.sizes ? "rotate-180" : ""
@@ -175,27 +190,29 @@ const CompanyFilters = ({
               />
             </button>
 
-            {openDropdowns.sizes &&
-              !filtersDisabled && ( // filtres désactivés avant implementation de la recherche par taille et ville
-                <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-auto">
-                  {sizeOptions.map((option, index) => (
-                    <label
-                      key={index} // Utilisez l'index comme clé
-                      className="flex items-center px-3 py-2 hover:bg-gray-50 cursor-pointer"
-                    >
-                      <input
-                        type="checkbox"
-                        checked={(filters.sizes || []).includes(option.label)} // Utilisez le label
-                        onChange={() =>
-                          handleMultiSelectChange("sizes", option.label)
-                        } // Passez le label
-                        className="mr-3 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                      />
-                      <span className="text-sm">{option.label}</span>
-                    </label>
-                  ))}
-                </div>
-              )}
+            {openDropdowns.sizes && !filtersDisabled && (
+              <div
+                ref={sizeDropdownRef}
+                className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-auto"
+              >
+                {sizeOptions.map((option, index) => (
+                  <label
+                    key={index}
+                    className="flex items-center px-3 py-2 hover:bg-gray-50 cursor-pointer"
+                  >
+                    <input
+                      type="checkbox"
+                      checked={(filters.sizes || []).includes(option.label)}
+                      onChange={() =>
+                        handleMultiSelectChange("sizes", option.label)
+                      }
+                      className="mr-3 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                    />
+                    <span className="text-sm">{option.label}</span>
+                  </label>
+                ))}
+              </div>
+            )}
           </div>
         </div>
 
@@ -213,8 +230,8 @@ const CompanyFilters = ({
                 : "focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             }`}
             placeholder="Tapez une ville et appuyez sur Entrée"
-            onKeyDown={filtersDisabled ? undefined : handleCityKeyPress} // filtres désactivés avant implementation de la recherche par taille et ville
-            onBlur={filtersDisabled ? undefined : handleCityBlur} // filtres désactivés avant implementation de la recherche par taille et ville
+            onKeyDown={filtersDisabled ? undefined : handleCityKeyPress}
+            onBlur={filtersDisabled ? undefined : handleCityBlur}
             autoComplete="off"
           />
           {filters.cities && filters.cities.length > 0 && (
@@ -259,9 +276,9 @@ const CompanyFilters = ({
       </div>
 
       {/* Résumé des filtres actifs */}
-      {((filters.naf_sous_classes && filters.naf_sous_classes.length > 0) ||
-        (filters.sizes && filters.sizes.length > 0) ||
-        (filters.cities && filters.cities.length > 0)) && (
+      {((filters.naf_sous_classes?.length || 0) > 0 ||
+        (filters.sizes?.length || 0) > 0 ||
+        (filters.cities?.length || 0) > 0) && (
         <div className="pt-4 border-t border-gray-200">
           <div className="flex items-center justify-between">
             <span className="text-sm font-medium text-gray-700">
