@@ -1,12 +1,5 @@
 import React, { useState } from "react";
-import {
-  Mail,
-  Building,
-  AlertCircle,
-  CheckCircle,
-  Search,
-  User,
-} from "lucide-react";
+import { Mail, Building, AlertCircle, Search, User } from "lucide-react";
 
 const CompanyTable = ({
   companies,
@@ -78,7 +71,7 @@ const CompanyTable = ({
           className="px-3 py-1 text-xs rounded bg-purple-600 text-white hover:bg-purple-700 disabled:bg-gray-400 disabled:cursor-not-allowed flex items-center gap-1"
         >
           <Mail className="w-3 h-3" />
-          Vérifier avec Snovio
+          Vérifier
         </button>
       );
     }
@@ -121,8 +114,7 @@ const CompanyTable = ({
 
     return (
       <div className="flex items-center gap-1">
-        <CheckCircle className="w-3 h-3 text-green-500" />
-        <span className="px-2 py-1 text-xs rounded-full bg-green-100 text-green-800">
+        <span className="px-2 py-1 text-xs text-center rounded-full bg-green-100 text-green-800">
           {snovioData.email_count} emails
         </span>
       </div>
@@ -150,6 +142,9 @@ const CompanyTable = ({
                 Classe d'établissement
               </th>
               <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">
+                Nombres d'employés
+              </th>
+              <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">
                 Vérification emails
               </th>
               <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">
@@ -168,6 +163,9 @@ const CompanyTable = ({
                 </td>
                 <td className="px-4 py-3 text-gray-600 text-sm">
                   {company.naf_label}
+                </td>
+                <td className="px-4 py-3 text-gray-600 text-sm">
+                  {company.employees}
                 </td>
                 <td className="px-4 py-3">{renderEmailStatus(company)}</td>
                 <td className="px-4 py-3">

@@ -8,22 +8,18 @@ const ContactFilters = ({
   onSearch,
   isLoading,
 }) => {
-  // Adapter les données entre PosteSearchField (titles array) et App.js (position string)
   const handlePostesChange = (updaterFunction) => {
     if (typeof updaterFunction === "function") {
-      // Si c'est une fonction, on l'applique
       const newFilters = updaterFunction(filters);
 
-      // Convertir titles (array) vers position (string) pour le backend
       if (newFilters.titles) {
         const positionString = newFilters.titles.join(",");
         onFiltersChange((prev) => ({
           ...prev,
-          position: positionString, // Garder position comme dans l'original
+          position: positionString,
         }));
       }
     } else {
-      // Si c'est un objet direct
       if (updaterFunction.titles) {
         const positionString = updaterFunction.titles.join(",");
         onFiltersChange((prev) => ({
@@ -34,7 +30,6 @@ const ContactFilters = ({
     }
   };
 
-  // Convertir position (string) vers titles (array) pour PosteSearchField
   const adapatedFilters = {
     ...filters,
     titles: filters.position ? filters.position.split(",") : [],
@@ -49,10 +44,10 @@ const ContactFilters = ({
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
         {/* PosteSearchField avec adaptation des données */}
-        <div className="md:col-span-2">
+        <div className="md:col-span-2 ">
           <PosteSearchField
-            filters={adapatedFilters} // Passer les données adaptées
-            onFilterChange={handlePostesChange} // Adapter les changements
+            filters={adapatedFilters}
+            onFilterChange={handlePostesChange}
           />
         </div>
 

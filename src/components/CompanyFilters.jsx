@@ -11,8 +11,7 @@ const CompanyFilters = ({
   const [openDropdowns, setOpenDropdowns] = useState({});
   const [cityInputRef] = useState(null);
 
-  // filtres désactivés avant implementation de la recherche par taille et ville
-  const [filtersDisabled] = useState(true);
+  const [filtersDisabled] = useState(false);
 
   const handleFilterChange = useCallback(
     (field, value) => {
@@ -115,10 +114,20 @@ const CompanyFilters = ({
   }, [filters, onSearch]);
 
   const sizeOptions = [
-    { value: "TPE", label: "TPE (1-9 employés)" },
-    { value: "PME", label: "PME (10-249 employés)" },
-    { value: "ETI", label: "ETI (250-4999 employés)" },
-    { value: "GE", label: "GE (5000+ employés)" },
+    { label: "Etablissement non employeur" },
+    { label: "3 à 5 salariés" },
+    { label: "6 à 9 salariés" },
+    { label: "10 à 19 salariés" },
+    { label: "20 à 49 salariés" },
+    { label: "50 à 99 salariés" },
+    { label: "100 à 199 salariés" },
+    { label: "200 à 249 salariés" },
+    { label: "250 à 499 salariés" },
+    { label: "500 à 999 salariés" },
+    { label: "1 000 à 1 999 salariés" },
+    { label: "2 000 à 4 999 salariés" },
+    { label: "5 000 à 9 999 salariés" },
+    { label: "10 000 salariés et plus" },
   ];
 
   return (
@@ -169,17 +178,17 @@ const CompanyFilters = ({
             {openDropdowns.sizes &&
               !filtersDisabled && ( // filtres désactivés avant implementation de la recherche par taille et ville
                 <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-auto">
-                  {sizeOptions.map((option) => (
+                  {sizeOptions.map((option, index) => (
                     <label
-                      key={option.value}
+                      key={index} // Utilisez l'index comme clé
                       className="flex items-center px-3 py-2 hover:bg-gray-50 cursor-pointer"
                     >
                       <input
                         type="checkbox"
-                        checked={(filters.sizes || []).includes(option.value)}
+                        checked={(filters.sizes || []).includes(option.label)} // Utilisez le label
                         onChange={() =>
-                          handleMultiSelectChange("sizes", option.value)
-                        }
+                          handleMultiSelectChange("sizes", option.label)
+                        } // Passez le label
                         className="mr-3 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
                       />
                       <span className="text-sm">{option.label}</span>
@@ -187,31 +196,6 @@ const CompanyFilters = ({
                   ))}
                 </div>
               )}
-
-            {(filters.sizes?.length || 0) > 0 && (
-              <div className="flex flex-wrap gap-1 mt-2">
-                {(filters.sizes || []).map((value) => {
-                  const option = sizeOptions.find((opt) => opt.value === value);
-                  return (
-                    <span
-                      key={value}
-                      className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800"
-                    >
-                      {option ? option.label : value}
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          removeFilter("sizes", value);
-                        }}
-                        className="ml-1 h-3 w-3 rounded-full inline-flex items-center justify-center text-blue-500 hover:bg-blue-200"
-                      >
-                        <X className="h-2 w-2" />
-                      </button>
-                    </span>
-                  );
-                })}
-              </div>
-            )}
           </div>
         </div>
 
