@@ -148,7 +148,7 @@ const CompanyTable = ({
                 Vérification emails
               </th>
               <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">
-                Chercher prospects
+                Chercher contacts
               </th>
             </tr>
           </thead>

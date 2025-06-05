@@ -5,7 +5,7 @@ const Header = () => {
         Recherche Entreprises & Contacts
       </h1>
       <p className="text-gray-600">
-        Trouvez des entreprises et leurs contacts email facilement
+        Trouvez des entreprises et leurs contacts email
       </p>
     </div>
   );
