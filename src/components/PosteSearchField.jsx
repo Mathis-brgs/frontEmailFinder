@@ -13,6 +13,7 @@ const PosteSearchField = ({ filters, onFilterChange }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
   const [searchError, setSearchError] = useState("");
+  const [customInput, setCustomInput] = useState("");
   const debounceTimeout = useRef(null);
   const dropdownRef = useRef(null);
 
@@ -67,6 +68,18 @@ const PosteSearchField = ({ filters, onFilterChange }) => {
       setIsSearching(false);
     }
   }, []);
+
+  const handleKeyDown = useCallback(
+    (e) => {
+      if (e.key === "Enter" && customInput.trim()) {
+        e.preventDefault();
+        toggleTitleItem(customInput.trim());
+        setCustomInput("");
+        setSearchTerm("");
+      }
+    },
+    [customInput, toggleTitleItem]
+  );
 
   useEffect(() => {
     if (debounceTimeout.current) {
@@ -143,9 +156,13 @@ const PosteSearchField = ({ filters, onFilterChange }) => {
             <div className="relative">
               <input
                 type="text"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                placeholder="Rechercher un poste..."
+                value={customInput}
+                onChange={(e) => {
+                  setCustomInput(e.target.value);
+                  setSearchTerm(e.target.value);
+                }}
+                onKeyDown={handleKeyDown}
+                placeholder="Rechercher ou ajouter un poste..."
                 className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
                 autoFocus
               />
@@ -155,6 +172,12 @@ const PosteSearchField = ({ filters, onFilterChange }) => {
                 </div>
               )}
             </div>
+            {customInput.trim() && (
+              <div className="mt-2 text-xs text-gray-500">
+                Appuyez sur Entrée pour ajouter "{customInput.trim()}" comme
+                poste personnalisé
+              </div>
+            )}
           </div>
 
           {/* Messages d'erreur */}

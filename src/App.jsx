@@ -15,7 +15,7 @@ const App = () => {
   const [companyFilters, setCompanyFilters] = useState({
     naf_sous_classes: [],
     sizes: [],
-    cities: [],
+    codesPostaux: [],
   });
 
   const [jobFilters, setJobFilters] = useState({
@@ -54,9 +54,10 @@ const App = () => {
           naf_sous_classes: filters.naf_sous_classes.map((naf) => naf.libelle),
 
           sizes: filters.sizes || [],
-          cities: filters.cities || [],
+          codesPostaux: filters.codesPostaux || [],
         }),
       });
+      console.log("Codes Postaux envoyés:", filters.codesPostaux);
 
       if (response.ok) {
         const data = await response.json();
@@ -168,7 +169,7 @@ const App = () => {
     setCompanyFilters({
       naf_sous_classes: [],
       sizes: [],
-      cities: [],
+      codesPostaux: [],
     });
 
     setJobFilters({

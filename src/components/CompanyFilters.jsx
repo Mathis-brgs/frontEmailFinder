@@ -9,7 +9,7 @@ const CompanyFilters = ({
   isSearching,
 }) => {
   const [openDropdowns, setOpenDropdowns] = useState({});
-  const [cityInputRef] = useState(null);
+  const [codePostalInputRef] = useState(null);
   const [filtersDisabled] = useState(false);
   const sizeDropdownRef = useRef(null);
 
@@ -51,51 +51,53 @@ const CompanyFilters = ({
     }));
   }, []);
 
-  const addCity = useCallback(
-    (cityValue) => {
-      if (cityValue.trim()) {
-        const cities = cityValue
+  const addCodePostal = useCallback(
+    (codePostalValue) => {
+      if (codePostalValue.trim()) {
+        const codesPostaux = codePostalValue
           .split(",")
-          .map((city) => city.trim())
-          .filter((city) => city);
-        const currentCities = filters.cities || [];
-        const newCities = [...new Set([...currentCities, ...cities])];
-        handleFilterChange("cities", newCities);
+          .map((codePostal) => codePostal.trim())
+          .filter((codePostal) => codePostal);
+        const currentCodesPostaux = filters.codesPostaux || [];
+        const newCodesPostaux = [
+          ...new Set([...currentCodesPostaux, ...codesPostaux]),
+        ];
+        handleFilterChange("codesPostaux", newCodesPostaux);
       }
     },
-    [filters.cities, handleFilterChange]
+    [filters.codesPostaux, handleFilterChange]
   );
 
-  const handleCityKeyPress = useCallback(
+  const handleCodePostalKeyPress = useCallback(
     (e) => {
       if (e.key === "Enter") {
         e.preventDefault();
         const value = e.target.value;
         if (value.trim()) {
-          addCity(value);
+          addCodePostal(value);
           e.target.value = "";
         }
       }
     },
-    [addCity]
+    [addCodePostal]
   );
 
-  const handleCityBlur = useCallback(
+  const handleCodePostalBlur = useCallback(
     (e) => {
       const value = e.target.value;
       if (value.trim()) {
-        addCity(value);
+        addCodePostal(value);
         e.target.value = "";
       }
     },
-    [addCity]
+    [addCodePostal]
   );
 
   const clearAllFilters = useCallback(() => {
     onFiltersChange({
       naf_sous_classes: [],
       sizes: [],
-      cities: [],
+      codesPostaux: [],
     });
   }, [onFiltersChange]);
 
@@ -222,28 +224,28 @@ const CompanyFilters = ({
             Villes
           </label>
           <input
-            ref={cityInputRef}
+            ref={codePostalInputRef}
             type="text"
             className={`w-full p-3 border border-gray-300 rounded-lg ${
               filtersDisabled
                 ? "pointer-events-none opacity-50"
                 : "focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             }`}
-            placeholder="Tapez une ville et appuyez sur Entrée"
-            onKeyDown={filtersDisabled ? undefined : handleCityKeyPress}
-            onBlur={filtersDisabled ? undefined : handleCityBlur}
+            placeholder="Tapez le cp d'un département et appuyez sur Entrée"
+            onKeyDown={filtersDisabled ? undefined : handleCodePostalKeyPress}
+            onBlur={filtersDisabled ? undefined : handleCodePostalBlur}
             autoComplete="off"
           />
-          {filters.cities && filters.cities.length > 0 && (
+          {filters.codesPostaux && filters.codesPostaux.length > 0 && (
             <div className="flex flex-wrap gap-1 mt-2">
-              {filters.cities.map((city) => (
+              {filters.codesPostaux.map((codePostal) => (
                 <span
-                  key={city}
+                  key={codePostal}
                   className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800"
                 >
-                  {city}
+                  {codePostal}
                   <button
-                    onClick={() => removeFilter("cities", city)}
+                    onClick={() => removeFilter("codesPostaux", codePostal)}
                     className="ml-1 h-3 w-3 rounded-full inline-flex items-center justify-center text-purple-500 hover:bg-purple-200"
                   >
                     <X className="h-2 w-2" />
@@ -278,14 +280,14 @@ const CompanyFilters = ({
       {/* Résumé des filtres actifs */}
       {((filters.naf_sous_classes?.length || 0) > 0 ||
         (filters.sizes?.length || 0) > 0 ||
-        (filters.cities?.length || 0) > 0) && (
+        (filters.codesPostaux?.length || 0) > 0) && (
         <div className="pt-4 border-t border-gray-200">
           <div className="flex items-center justify-between">
             <span className="text-sm font-medium text-gray-700">
               Filtres actifs:{" "}
               {(filters.naf_sous_classes?.length || 0) +
                 (filters.sizes?.length || 0) +
-                (filters.cities?.length || 0)}{" "}
+                (filters.codesPostaux?.length || 0)}{" "}
               sélection(s)
             </span>
             <button

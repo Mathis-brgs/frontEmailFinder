@@ -145,6 +145,9 @@ const CompanyTable = ({
                 Nombres d'employés
               </th>
               <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">
+                Code postal
+              </th>
+              <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">
                 Vérification emails
               </th>
               <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">
@@ -166,6 +169,9 @@ const CompanyTable = ({
                 </td>
                 <td className="px-4 py-3 text-gray-600 text-sm">
                   {company.employees}
+                </td>
+                <td className="px-4 py-3 text-gray-600 text-sm">
+                  {company.postal_code}
                 </td>
                 <td className="px-4 py-3">{renderEmailStatus(company)}</td>
                 <td className="px-4 py-3">
