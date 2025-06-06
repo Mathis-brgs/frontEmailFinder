@@ -113,6 +113,7 @@ const CompanyFilters = ({
 
   const sizeOptions = [
     { label: "Etablissement non employeur" },
+    { label: "1 ou 2 salariés" },
     { label: "3 à 5 salariés" },
     { label: "6 à 9 salariés" },
     { label: "10 à 19 salariés" },
@@ -128,7 +129,6 @@ const CompanyFilters = ({
     { label: "10 000 salariés et plus" },
   ];
 
-  // 🧠 Fermer dropdown au clic extérieur
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (
