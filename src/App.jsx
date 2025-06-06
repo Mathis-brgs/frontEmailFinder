@@ -247,6 +247,13 @@ const App = () => {
 
     saveAs(blob, "contacts.xlsx");
   };
+  const onToggleSelectAll = (selectAll) => {
+    if (selectAll) {
+      setSelectedContacts(contacts); // tous cochés
+    } else {
+      setSelectedContacts([]); // aucun coché
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -380,6 +387,7 @@ const App = () => {
               selectedContacts={selectedContacts}
               onToggleSelect={toggleContactSelection}
               onAddToExcel={addToExcel}
+              onToggleSelectAll={onToggleSelectAll}
             />
           </>
         )}

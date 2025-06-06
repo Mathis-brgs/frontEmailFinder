@@ -6,6 +6,7 @@ const ContactTable = ({
   onToggleSelect,
   selectedContacts,
   onAddToExcel,
+  onToggleSelectAll,
 }) => {
   if (!hasSearched) {
     return null;
@@ -22,7 +23,27 @@ const ContactTable = ({
         <table className="w-full table-auto">
           <thead>
             <tr className="bg-gray-50">
-              <th className="px-4 py-3"></th>
+              <th className="px-4 py-3">
+                <input
+                  type="checkbox"
+                  checked={
+                    contacts.length > 0 &&
+                    selectedContacts.length === contacts.length
+                  }
+                  ref={(el) => {
+                    if (el) {
+                      el.indeterminate =
+                        selectedContacts.length > 0 &&
+                        selectedContacts.length < contacts.length;
+                    }
+                  }}
+                  onChange={() => {
+                    const allSelected =
+                      selectedContacts.length === contacts.length;
+                    onToggleSelectAll(!allSelected);
+                  }}
+                />
+              </th>
               <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">
                 Prénom
               </th>
