@@ -5,6 +5,8 @@ import CompanyFilters from "./components/CompanyFilters";
 import CompanyTable from "./components/CompanyTable";
 import ContactFilters from "./components/ContactFilters";
 import ContactTable from "./components/ContactTable";
+import * as XLSX from "xlsx";
+import { saveAs } from "file-saver";
 
 const API_URL =
   window.location.hostname === "localhost"
@@ -29,11 +31,35 @@ const App = () => {
   const [isSearching, setIsSearching] = useState(false);
   const [companyError, setCompanyError] = useState("");
   const [searchPerformed, setSearchPerformed] = useState(false);
+  const [selectedContacts, setSelectedContacts] = useState([]);
+  const [excelData, setExcelData] = useState([]);
 
   const [contacts, setContacts] = useState([]);
   const [isLoadingContacts, setIsLoadingContacts] = useState(false);
   const [contactError, setContactError] = useState("");
   const [hasSearched, setHasSearched] = useState(false);
+
+  const toggleContactSelection = (contact) => {
+    setSelectedContacts((prev) =>
+      prev.some((c) => c.id === contact.id)
+        ? prev.filter((c) => c.id !== contact.id)
+        : [...prev, contact]
+    );
+  };
+
+  const addToExcel = () => {
+    console.log("Contacts sélectionnés pour export:", selectedContacts);
+    const enriched = selectedContacts.map((c) => ({
+      company_name:
+        companies.find((co) => co.domain === selectedDomain)?.company_name ||
+        "",
+      siren: companies.find((co) => co.domain === selectedDomain)?.siren || "",
+      ...c,
+    }));
+
+    setExcelData((prev) => [...prev, ...enriched]);
+    setSelectedContacts([]);
+  };
 
   const handleCompanySearch = async (filters) => {
     if (!filters?.naf_sous_classes?.length) {
@@ -184,11 +210,55 @@ const App = () => {
     setCompanyError("");
     setContactError("");
     setSearchPerformed(false);
+    setExcelData([]);
+  };
+
+  const handleUpdateDomain = (index, newDomain) => {
+    setCompanies((prev) =>
+      prev.map((company, i) =>
+        i === index ? { ...company, domain: newDomain } : company
+      )
+    );
+  };
+
+  const handleDownloadExcel = () => {
+    if (excelData.length === 0) return;
+
+    const worksheet = XLSX.utils.json_to_sheet(
+      excelData.map((c) => ({
+        "Dénomination entreprise": c.company_name,
+        SIREN: c.siren,
+        Prénom: c.first_name,
+        Nom: c.last_name,
+        Email: Array.isArray(c.emails) ? c.emails[0] : c.emails || "",
+        Poste: c.position,
+        LinkedIn: c.linkedin,
+      }))
+    );
+
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Contacts");
+
+    const excelBuffer = XLSX.write(workbook, {
+      type: "array",
+      bookType: "xlsx",
+    });
+    const blob = new Blob([excelBuffer], { type: "application/octet-stream" });
+
+    saveAs(blob, "contacts.xlsx");
   };
 
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-7xl mx-auto p-6 space-y-8">
+        {excelData.length > 0 && (
+          <button
+            onClick={handleDownloadExcel}
+            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+          >
+            Télécharger le fichier Excel ({excelData.length} contacts)
+          </button>
+        )}
         {/* Header */}
         <Header />
 
@@ -277,6 +347,7 @@ const App = () => {
               onSelectDomain={handleDomainSelect}
               onSnovioQuery={handleSnovioQuery}
               isFindingEmails={isFindingEmails}
+              onUpdateDomain={handleUpdateDomain}
             />
           )}
           {/* Message si aucune entreprise trouvée */}
@@ -303,7 +374,13 @@ const App = () => {
               isLoading={isLoadingContacts}
             />
 
-            <ContactTable contacts={contacts} hasSearched={hasSearched} />
+            <ContactTable
+              contacts={contacts}
+              hasSearched={hasSearched}
+              selectedContacts={selectedContacts}
+              onToggleSelect={toggleContactSelection}
+              onAddToExcel={addToExcel}
+            />
           </>
         )}
       </div>

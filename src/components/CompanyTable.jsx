@@ -7,9 +7,28 @@ const CompanyTable = ({
   onSelectDomain,
   onSnovioQuery,
   isFindingEmails,
+  onUpdateDomain,
 }) => {
+  const [editingDomain, setEditingDomain] = useState({});
   const [snovioResults, setSnovioResults] = useState({});
   const [countLoading, setCountLoading] = useState({});
+
+  const handleDomainChange = (index, value) => {
+    setEditingDomain((prev) => ({ ...prev, [index]: value }));
+  };
+
+  const handleDomainSave = (index) => {
+    const newDomain = editingDomain[index]?.trim();
+    if (newDomain) {
+      onUpdateDomain(index, newDomain); // callback parent pour update
+      setEditingDomain((prev) => {
+        const copy = { ...prev };
+        delete copy[index];
+        return copy;
+      });
+    }
+  };
+
   const API_URL =
     window.location.hostname === "localhost"
       ? process.env.REACT_APP_API_URL_LOCAL
@@ -139,21 +158,24 @@ const CompanyTable = ({
                 Dénomination
               </th>
               <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">
+                Domaine
+              </th>
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-700">
                 Classe d'établissement
               </th>
-              <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-700">
                 Nombres d'employés
               </th>
-              <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-700">
                 Code postal
               </th>
-              <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-700">
                 Nbs emails xerfi
               </th>
-              <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-700">
                 Vérification emails
               </th>
-              <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-700">
                 Chercher contacts
               </th>
             </tr>
@@ -161,22 +183,56 @@ const CompanyTable = ({
           <tbody className="divide-y divide-gray-200">
             {companies.map((company, index) => (
               <tr key={index} className="hover:bg-gray-50">
-                <td className="px-4 py-3 font-medium text-sm text-gray-900">
+                <td className="px-4 py-3 font-medium text-xs text-gray-900">
                   {company.siren || "N/A"}
                 </td>
-                <td className="px-4 py-3 font-medium text-sm text-gray-900">
+                <td className="px-4 py-3 font-medium text-xs text-gray-900">
                   {company.company_name}
                 </td>
-                <td className="px-4 py-3 text-gray-600 text-sm">
+                <td className="px-4 py-3 font-medium text-xs text-gray-900">
+                  {editingDomain[index] !== undefined ? (
+                    <input
+                      type="text"
+                      value={editingDomain[index]}
+                      onChange={(e) =>
+                        handleDomainChange(index, e.target.value)
+                      }
+                      onBlur={() => handleDomainSave(index)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") {
+                          handleDomainSave(index);
+                        }
+                      }}
+                      className="text-xs px-2 py-1 border border-gray-300 rounded w-full"
+                      autoFocus
+                    />
+                  ) : (
+                    <span
+                      onClick={() =>
+                        setEditingDomain((prev) => ({
+                          ...prev,
+                          [index]: company.domain || "",
+                        }))
+                      }
+                      className="cursor-pointer hover:underline"
+                      title="Cliquer pour modifier"
+                    >
+                      {company.domain || (
+                        <em className="text-gray-400">Ajouter un domaine</em>
+                      )}
+                    </span>
+                  )}
+                </td>
+                <td className="px-4 py-3 text-gray-600 text-xs">
                   {company.naf_label}
                 </td>
-                <td className="px-4 py-3 text-gray-600 text-sm">
+                <td className="px-4 py-3 text-gray-600 text-xs">
                   {company.employees}
                 </td>
-                <td className="px-4 py-3 text-gray-600 text-sm">
+                <td className="px-4 py-3 text-gray-600 text-xs">
                   {company.postal_code}
                 </td>
-                <td className="px-4 py-3 text-gray-600 text-sm">
+                <td className="px-4 py-3 text-gray-600 text-xs">
                   {company.email_count}
                 </td>
                 <td className="px-4 py-3">{renderEmailStatus(company)}</td>

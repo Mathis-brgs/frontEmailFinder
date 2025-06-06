@@ -1,6 +1,12 @@
 import { Mail, ExternalLink, Briefcase } from "lucide-react";
 
-const ContactTable = ({ contacts, hasSearched }) => {
+const ContactTable = ({
+  contacts,
+  hasSearched,
+  onToggleSelect,
+  selectedContacts,
+  onAddToExcel,
+}) => {
   if (!hasSearched) {
     return null;
   }
@@ -16,6 +22,7 @@ const ContactTable = ({ contacts, hasSearched }) => {
         <table className="w-full table-auto">
           <thead>
             <tr className="bg-gray-50">
+              <th className="px-4 py-3"></th>
               <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">
                 Prénom
               </th>
@@ -37,21 +44,22 @@ const ContactTable = ({ contacts, hasSearched }) => {
             {contacts.length > 0 ? (
               contacts.map((contact) => (
                 <tr key={contact.id} className="hover:bg-gray-50">
+                  <td className="px-4 py-3">
+                    <input
+                      type="checkbox"
+                      checked={selectedContacts.some(
+                        (c) => c.id === contact.id
+                      )}
+                      onChange={() => onToggleSelect(contact)}
+                    />
+                  </td>
                   <td className="px-4 py-3 font-medium text-gray-900">
                     {contact.first_name}
                   </td>
                   <td className="px-4 py-3 font-medium text-gray-900">
                     {contact.last_name}
                   </td>
-                  <td className="px-4 py-3">
-                    <a
-                      href={`mailto:${contact.email}`}
-                      className="text-blue-600 hover:underline flex items-center gap-1"
-                    >
-                      <Mail className="w-4 h-4" />
-                      {contact.emails}
-                    </a>
-                  </td>
+                  <td className="px-4 py-3">{contact.emails}</td>
                   <td className="px-4 py-3">
                     <span className="px-2 py-1 text-xs rounded-full bg-purple-100 text-purple-800 flex items-center gap-1">
                       <Briefcase className="w-3 h-3" />
@@ -73,7 +81,7 @@ const ContactTable = ({ contacts, hasSearched }) => {
               ))
             ) : (
               <tr>
-                <td colSpan="5" className="px-4 py-8 text-center text-gray-500">
+                <td colSpan="6" className="px-4 py-8 text-center text-gray-500">
                   Aucun contact trouvé pour cette recherche
                 </td>
               </tr>
@@ -81,6 +89,18 @@ const ContactTable = ({ contacts, hasSearched }) => {
           </tbody>
         </table>
       </div>
+
+      {/* Bouton ajouter à Excel */}
+      {selectedContacts.length > 0 && (
+        <div className="mt-4 text-right">
+          <button
+            onClick={onAddToExcel}
+            className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
+          >
+            Ajouter {selectedContacts.length} contact(s) au fichier Excel
+          </button>
+        </div>
+      )}
     </div>
   );
 };
